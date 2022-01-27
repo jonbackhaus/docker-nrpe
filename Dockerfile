@@ -20,6 +20,7 @@ RUN apk add --no-cache \
 
 # ADD check_memory check_time_skew check_oxidized.rb check_docker check_swarm /usr/lib/nagios/plugins/
 # ADD nrpe.cfg /etc/nrpe.cfg
+
 RUN mkdir /nrpe \
    && chown -R nagios:nagios /nrpe
 

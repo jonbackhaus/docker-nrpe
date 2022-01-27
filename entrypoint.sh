@@ -2,7 +2,7 @@
 
 # sed -i "s/^allowed_hosts=127.0.0.1$/allowed_hosts=127.0.0.1, ${NAGIOS_SERVER}/g" /etc/nagios/nrpe.cfg
 
-/usr/bin/nrpe -c /nrpe/nrpe.cfg -d
+/usr/bin/nrpe -c /etc/nrpe.cfg -d
 
 # Wait for NRPE Daemon to exit
 PID=$(ps -ef | grep -v grep | grep  "nrpe" | awk '{print $1}')
