@@ -1,18 +1,32 @@
-FROM ubuntu:latest
+FROM alpine:3.14
 
-ARG DEBIAN_FRONTEND=noninteractive
+RUN addgroup -g 1000 nagios \
+   && adduser -u 1000 -G nagios -D -H nagios
 
-RUN apt-get update && apt-get upgrade -y \
-   && apt-get install -y nagios-nrpe-server nagios-plugins libmonitoring-plugin-perl sudo python3 ruby ruby-json \
-   && rm -rf /var/lib/apt/lists/* \
+RUN apk add --no-cache \
+      nrpe \
+      nagios-plugins-all \
+      # nagios-plugins-procs \
+      # nagios-plugins-time \
+      # nagios-plugins-load \
+      # nagios-plugins-swap \
+      # nagios-plugins-disk \
+      perl \
+      python3 \
+      sudo \
+   # && rc-update add nrpe default \
    && echo 'nagios ALL=(ALL) NOPASSWD: /usr/lib/nagios/plugins/*' >> /etc/sudoers \
-   && echo 'Defaults: nagios        !requiretty' >> /etc/sudoers \
-   && ln -sf /dev/stdout /var/log/nrpe.log
+   && echo 'Defaults: nagios        !requiretty' >> /etc/sudoers
 
-ADD check_memory check_time_skew check_oxidized.rb check_docker check_swarm check_cpu_stats.sh check_file_count check_ro_mounts /usr/lib/nagios/plugins/
-ADD nrpe.cfg /etc/nagios/nrpe.cfg
+# ADD check_memory check_time_skew check_oxidized.rb check_docker check_swarm /usr/lib/nagios/plugins/
+# ADD nrpe.cfg /etc/nrpe.cfg
+RUN mkdir /nrpe \
+   && chown -R nagios:nagios /nrpe
+
 ADD entrypoint.sh /entrypoint.sh
 
 EXPOSE 5666
+
+USER nagios
 
 CMD /entrypoint.sh
